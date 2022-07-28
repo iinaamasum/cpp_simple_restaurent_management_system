@@ -31,12 +31,44 @@ void items_initial_input(Restaurant &r, int n) {
  * @return void;
  */
 void all_items_show(Restaurant &r, int n) {
-    cout << "                  Make Bill                " << endl;
-    cout << "----------------------------------------------------" << endl;
+    cout << "                          All Item with Bill                " << endl;
+    cout << "-----------------------------------------------------------------------------------------" << endl;
     cout << "Item Code\t\tItem Name\t\tItem Price\n";
     for (int i = 0; i < n; i++) {
         cout << r.food_item_codes[i] << "\t\t" << r.food_item_names[i] << "\t\t" << r.food_item_prices[i] << endl;
     }
+}
+
+/**
+ * @brief the function prints table order with price;
+ * @param r -> the restaurant object;
+ * @return void;
+ */
+void table_order(Restaurant *r, int n, int table, int num_of_items, int *item_codes, int *item_quantities) {
+    cout << r << endl;
+    cout << "                              Bill Summary                    " << endl;
+    cout << "-----------------------------------------------------------------------------------------" << endl;
+    cout << "Table Number: " << table << endl;
+    cout << "Item Code\tItem Name\t\t\tItem Price\tQuantity\tTotal Price\n";
+    double total_price = 0;
+    for (int i = 0; i < num_of_items; i++) {
+        for (int j = 0; j < n; j++) {
+            if (item_codes[i] == (*r).food_item_codes[j]) {
+                total_price += (*r).food_item_prices[j] * item_quantities[i];
+                cout << (*r).food_item_codes[j] << "\t\t" << (*r).food_item_names[j] << "\t\t" << (*r).food_item_prices[j] << "\t\t" << item_quantities[i] << "\t\t" << (*r).food_item_prices[j] * item_quantities[i] << endl;
+            }
+        }
+    }
+    double Tax = total_price * 0.05;
+    double total_bill = total_price + Tax;
+    cout << "Tax:                                                                            " << Tax << endl;
+    cout << "-----------------------------------------------------------------------------------------" << endl;
+    cout << "Net Total:                                                                    " << total_bill << " Taka" << endl;
+    /**
+     * @brief adding Tax to the Restaurant object;
+     * @param r -> the restaurant object;
+     */
+    (*r).total_tax = Tax;
 }
 
 /**
@@ -45,7 +77,7 @@ void all_items_show(Restaurant &r, int n) {
  * @return void;
  */
 
-void user_order(Restaurant &res, int n) {
+void user_order(Restaurant *r, int n) {
     cout << "Enter the table number: ";
     int table;
     cin >> table;
@@ -54,13 +86,13 @@ void user_order(Restaurant &res, int n) {
     cin >> num_of_items;
     int item_codes[num_of_items];
     int item_quantities[num_of_items];
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < num_of_items; i++) {
     fail:
         cout << "Enter item " << i + 1 << " code: ";
         int item_code;
         cin >> item_code;
         for (int k = 0; k < n; k++) {
-            if (item_code == res.food_item_codes[k]) {
+            if (item_code == (*r).food_item_codes[k]) {
                 goto success;
             }
         }
@@ -73,33 +105,7 @@ void user_order(Restaurant &res, int n) {
         item_codes[i] = item_code;
         item_quantities[i] = item_quantity;
     }
-    cout << res << endl;
-    table_order(res, n, table, num_of_items, item_codes, item_quantities);
-}
-
-/**
- * @brief the function prints table order with price;
- * @param r -> the restaurant object;
- * @return void;
- */
-void table_order(Restaurant &r, int n, int table, int num_of_items, int *item_codes, int *item_quantities) {
-    cout << "                       Bill Summary                    " << endl;
-    cout << "----------------------------------------------------" << endl;
-    cout << "Table Number: " << table << endl;
-    cout << "Item Code\t\tItem Name\t\tItem Price\t\tQuantity\t\tTotal Price\n";
-    double total_price = 0;
-    for (int i = 0; i < num_of_items; i++) {
-        for (int j = 0; j < n; j++) {
-            if (item_codes[i] == r.food_item_codes[j]) {
-                total_price += r.food_item_prices[j] * item_quantities[i];
-                cout << r.food_item_codes[j] << "\t\t" << r.food_item_names[j] << "\t\t" << r.food_item_prices[j] << "\t\t" << item_quantities[i] << "\t\t" << r.food_item_prices[j] * item_quantities[i] << endl;
-            }
-        }
-    }
-    double Tax = total_price * 0.05;
-    double total_bill = total_price + Tax;
-    cout << "----------------------------------------------------" << endl;
-    cout << "Total Price:                                                               " << total_price << endl;
+    table_order(r, n, table, num_of_items, item_codes, item_quantities);
 }
 
 int main() {
@@ -109,6 +115,6 @@ int main() {
     Restaurant restaurant;
     items_initial_input(restaurant, n);
     all_items_show(restaurant, n);
-    user_order(restaurant, n);
+    user_order(&restaurant, n);
     return 0;
 }
